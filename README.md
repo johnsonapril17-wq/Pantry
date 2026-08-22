@@ -6,6 +6,7 @@ IndexedDB, nothing is sent anywhere, and it works offline.
 
 [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) transcribes those notes and is the
 source of truth for what this is meant to do.
+[`CHANGELOG.md`](CHANGELOG.md) records what has changed in each version.
 
 ## Running it
 

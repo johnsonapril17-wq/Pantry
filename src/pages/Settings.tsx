@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import {
   Download,
+  ExternalLink,
   FileSpreadsheet,
   FileText,
   Monitor,
@@ -20,6 +21,7 @@ import { THEMES, setMode, setTheme } from '@/hooks/useTheme';
 import { buildPantryCsv, buildWorkbook, download } from '@/export/workbook';
 import { exportBackup, importBackup } from '@/export/backup';
 import { isValidCurrency, isValidLocale } from '@/domain/format';
+import { APP_VERSION, CHANGELOG_URL, REPO_URL } from '@/domain/meta';
 import type { ModeSetting } from '@/domain/types';
 
 export function Settings() {
@@ -301,9 +303,21 @@ export function Settings() {
         />
       )}
 
-      <div className="small faint">
-        Pantry Tracker · everything is stored locally in this browser · {categories.length}{' '}
-        categories, {locations.length} locations, {stores.length} stores
+      <div className="small faint row wrap" style={{ gap: 'var(--space-2)' }}>
+        <span>
+          Pantry Tracker v{APP_VERSION} · everything is stored locally in this browser ·{' '}
+          {categories.length} categories, {locations.length} locations, {stores.length} stores
+        </span>
+        <span aria-hidden>·</span>
+        <a href={CHANGELOG_URL} target="_blank" rel="noreferrer noopener" className="row" style={{ gap: 4 }}>
+          Changelog
+          <ExternalLink size={12} />
+        </a>
+        <span aria-hidden>·</span>
+        <a href={REPO_URL} target="_blank" rel="noreferrer noopener" className="row" style={{ gap: 4 }}>
+          Source
+          <ExternalLink size={12} />
+        </a>
       </div>
     </Page>
   );
