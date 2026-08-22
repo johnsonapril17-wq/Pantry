@@ -27,7 +27,14 @@ export function StorageBanner() {
   const [dismissed, setDismissed] = useState(
     () => sessionStorage.getItem(DISMISS_KEY) === '1',
   );
-  const [asking, setAsking] = useState(false);
+  /**
+   * `declined` matters as much as `asking`.
+   *
+   * Browsers refuse `persist()` for sites they do not consider established,
+   * and they refuse silently. Without tracking the refusal the button appears
+   * to do nothing at all, which is exactly how it behaved on first release.
+   */
+  const [phase, setPhase] = useState<'idle' | 'asking' | 'declined'>('idle');
 
   useEffect(() => {
     let alive = true;
@@ -70,12 +77,24 @@ export function StorageBanner() {
         </span>
 
         <div className="grow" style={{ color: critical ? 'var(--danger-soft-text)' : 'var(--warn-soft-text)' }}>
-          {critical ? (
+          {critical && phase === 'declined' ? (
+            <>
+              <div className="strong">The browser refused to make storage permanent.</div>
+              <div className="small" style={{ marginTop: 2 }}>
+                Browsers only grant that to sites they consider established, and refuse without
+                explanation. Two things actually work:{' '}
+                <strong>install this app</strong> (look for the install icon in the address bar),
+                or <strong>bookmark it</strong> and keep using it. Until one of those sticks, an
+                exported backup is your only real protection.
+              </div>
+            </>
+          ) : critical ? (
             <>
               <div className="strong">This browser may delete your pantry without warning.</div>
               <div className="small" style={{ marginTop: 2 }}>
                 Storage here is marked temporary, so the browser is allowed to clear it during
-                routine cleanup. Making it permanent takes one click.
+                routine cleanup. You can ask it to make storage permanent, though the browser is
+                free to refuse.
               </div>
             </>
           ) : (
@@ -94,19 +113,24 @@ export function StorageBanner() {
         </div>
 
         <div className="row" style={{ gap: 'var(--space-2)', flex: 'none' }}>
-          {critical ? (
+          {critical && phase !== 'declined' ? (
             <button
               className="btn btn-sm btn-primary"
-              disabled={asking}
+              disabled={phase === 'asking'}
               onClick={async () => {
-                setAsking(true);
+                setPhase('asking');
                 const ok = await requestPersistentStorage();
                 setPersisted(ok);
-                setAsking(false);
+                // A refusal must be visible, or the button reads as broken.
+                setPhase(ok ? 'idle' : 'declined');
               }}
             >
-              {asking ? 'Asking...' : 'Make storage permanent'}
+              {phase === 'asking' ? 'Asking...' : 'Make storage permanent'}
             </button>
+          ) : critical ? (
+            <Link to="/settings" className="btn btn-sm btn-primary">
+              Back up now
+            </Link>
           ) : (
             <Link to="/settings" className="btn btn-sm">
               Back up now

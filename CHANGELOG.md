@@ -30,6 +30,22 @@ Notable changes to Pantry Tracker. Format follows
   the session and never appears on an empty app.
 - Full JSON exports now record a backup timestamp, so the reminder resets.
 
+### Added
+
+- **The app is now installable and works offline.** Real PNG icons at 192 and
+  512 px (plus maskable and Apple touch variants) and a service worker that
+  caches the shell. Installing is also what most reliably earns permanent
+  storage, so this is the practical fix for data being evicted.
+
+### Fixed
+
+- **"Make storage permanent" appeared to do nothing.** Browsers refuse the
+  request for sites they do not consider established, and refuse silently — so
+  the button sat there with no feedback. The refusal is now reported, with the
+  two things that actually work (install the app, or bookmark it), and the
+  action switches to "Back up now", which never fails. The wording no longer
+  claims it "takes one click".
+
 ### Changed
 
 - Money is shown with the narrow currency symbol, so amounts read `$12.50`

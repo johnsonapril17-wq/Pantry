@@ -1,9 +1,24 @@
 {
   "name": "Pantry Tracker",
   "short_name": "Pantry",
+  "description": "Pantry, grocery, price and budget tracker. Works offline; all data stays on your device.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#3f6212",
-  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "categories": ["food", "productivity", "utilities"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Grocery list", "url": "/#/grocery" },
+    { "name": "Pantry", "url": "/#/pantry" },
+    { "name": "Scan a sheet", "url": "/#/scan" }
+  ]
 }
