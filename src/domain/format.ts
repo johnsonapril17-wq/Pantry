@@ -1,6 +1,52 @@
 import { parseISODate, toISODate } from './stock';
 
 /* -------------------------------------------------------------------------- */
+/* Locale safety                                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The locale is a free-text setting, so it can be anything the user typed --
+ * `en-CAD`, a half-finished tag mid-keystroke, or empty. Every `Intl` call and
+ * every `toLocale*String` throws a RangeError on an invalid tag, and an
+ * exception thrown during render unmounts the entire app.
+ *
+ * So: no locale reaches `Intl` without passing through here first. An invalid
+ * tag silently falls back to the browser default rather than taking the app
+ * down over a formatting preference.
+ */
+const localeCache = new Map<string, string | undefined>();
+
+export function safeLocale(locale: string | undefined): string | undefined {
+  if (!locale) return undefined;
+  if (localeCache.has(locale)) return localeCache.get(locale);
+
+  let resolved: string | undefined;
+  try {
+    resolved = Intl.getCanonicalLocales(locale)[0];
+  } catch {
+    resolved = undefined;
+  }
+
+  localeCache.set(locale, resolved);
+  return resolved;
+}
+
+/** True when `locale` is a well-formed BCP 47 tag. Used to validate input. */
+export function isValidLocale(locale: string): boolean {
+  return safeLocale(locale) !== undefined;
+}
+
+/** True when `currency` is a well-formed ISO 4217 code. */
+export function isValidCurrency(currency: string): boolean {
+  try {
+    new Intl.NumberFormat(undefined, { style: 'currency', currency });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* Money                                                                       */
 /* -------------------------------------------------------------------------- */
 
@@ -10,10 +56,17 @@ function moneyFormatter(locale: string, currency: string): Intl.NumberFormat {
   const key = `${locale}|${currency}`;
   let f = moneyCache.get(key);
   if (!f) {
+    const tag = safeLocale(locale);
     try {
-      f = new Intl.NumberFormat(locale, { style: 'currency', currency });
+      f = new Intl.NumberFormat(tag, { style: 'currency', currency });
     } catch {
-      f = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+      // Bad currency code as well as a bad locale: fall back to plain numbers
+      // with a currency-shaped format rather than showing nothing.
+      try {
+        f = new Intl.NumberFormat(tag, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } catch {
+        f = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+      }
     }
     moneyCache.set(key, f);
   }
@@ -54,12 +107,17 @@ export function qtyUnit(n: number | undefined | null, unit: string): string {
  * without that, a date 300 days out reads as "18 Jun" and looks like it has
  * already passed.
  */
+/** Every date formatter routes through here, so a bad tag can never throw. */
+function formatDate(d: Date, locale: string, options: Intl.DateTimeFormatOptions): string {
+  return d.toLocaleDateString(safeLocale(locale), options);
+}
+
 export function shortDate(iso?: string, locale = 'en-AU'): string {
   if (!iso) return '--';
   const d = parseISODate(iso) ?? new Date(iso);
   if (Number.isNaN(d.getTime())) return '--';
   const sameYear = d.getFullYear() === new Date().getFullYear();
-  return d.toLocaleDateString(locale, {
+  return formatDate(d, locale, {
     day: 'numeric',
     month: 'short',
     year: sameYear ? undefined : '2-digit',
@@ -70,12 +128,13 @@ export function mediumDate(iso?: string, locale = 'en-AU'): string {
   if (!iso) return '--';
   const d = parseISODate(iso) ?? new Date(iso);
   if (Number.isNaN(d.getTime())) return '--';
-  return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+  return formatDate(d, locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export function monthLabel(iso: string, locale = 'en-AU'): string {
   const d = parseISODate(iso) ?? new Date(iso);
-  return d.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+  if (Number.isNaN(d.getTime())) return '--';
+  return formatDate(d, locale, { month: 'short', year: '2-digit' });
 }
 
 /** Start of the budget week containing `d`, honouring `weekStartsOn` (0 = Sun). */
@@ -121,8 +180,8 @@ export function withinRange(iso: string, from: Date, to: Date): boolean {
 
 export function rangeLabel(from: Date, to: Date, locale = 'en-AU'): string {
   const same = from.getMonth() === to.getMonth() && from.getFullYear() === to.getFullYear();
-  const a = from.toLocaleDateString(locale, { day: 'numeric', month: same ? undefined : 'short' });
-  const b = to.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+  const a = formatDate(from, locale, { day: 'numeric', month: same ? undefined : 'short' });
+  const b = formatDate(to, locale, { day: 'numeric', month: 'short' });
   return `${a} - ${b}`;
 }
 

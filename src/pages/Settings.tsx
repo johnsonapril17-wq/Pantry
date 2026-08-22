@@ -19,6 +19,7 @@ import { useCategories, useItems, useLocations, useSettings, useStores } from '@
 import { THEMES, setMode, setTheme } from '@/hooks/useTheme';
 import { buildPantryCsv, buildWorkbook, download } from '@/export/workbook';
 import { exportBackup, importBackup } from '@/export/backup';
+import { isValidCurrency, isValidLocale } from '@/domain/format';
 import type { ModeSetting } from '@/domain/types';
 
 export function Settings() {
@@ -161,20 +162,23 @@ export function Settings() {
                 onChange={(e) => update({ monthlyBudget: Number(e.target.value) })}
               />
             </Field>
-            <Field label="Currency" hint="ISO code, e.g. AUD, GBP, USD">
-              <input
-                className="input"
-                value={settings.currency}
-                onChange={(e) => update({ currency: e.target.value.toUpperCase().slice(0, 3) })}
-              />
-            </Field>
-            <Field label="Locale" hint="Controls date and number formatting">
-              <input
-                className="input"
-                value={settings.locale}
-                onChange={(e) => update({ locale: e.target.value })}
-              />
-            </Field>
+            <ValidatedField
+              label="Currency"
+              hint="ISO code, e.g. AUD, GBP, USD"
+              value={settings.currency}
+              validate={isValidCurrency}
+              normalise={(v) => v.toUpperCase().slice(0, 3)}
+              invalidMessage="Not a currency code."
+              onCommit={(currency) => update({ currency })}
+            />
+            <ValidatedField
+              label="Locale"
+              hint="Controls date and number formatting, e.g. en-AU"
+              value={settings.locale}
+              validate={isValidLocale}
+              invalidMessage="Not a valid language tag."
+              onCommit={(locale) => update({ locale })}
+            />
             <Field label="Week starts on">
               <select
                 className="select"
@@ -302,6 +306,81 @@ export function Settings() {
         categories, {locations.length} locations, {stores.length} stores
       </div>
     </Page>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* A text setting that must stay valid                                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Currency and locale are fed straight to `Intl`, which throws on anything
+ * malformed. Committing every keystroke means "en-AU" is briefly "e", "en",
+ * "en-" -- and a value like "en-CAD" would stick permanently.
+ *
+ * So the field keeps its own draft while you type, shows whether the draft is
+ * usable, and only writes through when it is. What is stored is always valid.
+ */
+function ValidatedField({
+  label,
+  hint,
+  value,
+  validate,
+  normalise,
+  invalidMessage,
+  onCommit,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  validate: (v: string) => boolean;
+  normalise?: (v: string) => string;
+  invalidMessage: string;
+  onCommit: (v: string) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const shown = draft ?? value;
+  const valid = validate(shown);
+
+  const commit = (raw: string) => {
+    const next = normalise ? normalise(raw) : raw;
+    if (validate(next)) {
+      onCommit(next);
+      setDraft(null);
+    } else {
+      setDraft(next);
+    }
+  };
+
+  return (
+    <div className="field">
+      <label>{label}</label>
+      <input
+        className="input"
+        value={shown}
+        aria-invalid={!valid}
+        style={valid ? undefined : { borderColor: 'var(--danger)' }}
+        onChange={(e) => {
+          const next = normalise ? normalise(e.target.value) : e.target.value;
+          setDraft(next);
+          // Write through as soon as it becomes valid, so the app updates live.
+          if (validate(next)) {
+            onCommit(next);
+            setDraft(null);
+          }
+        }}
+        onBlur={(e) => commit(e.target.value)}
+      />
+      <span className="tiny" style={{ color: valid ? 'var(--text-faint)' : 'var(--danger)' }}>
+        {valid
+          ? hint
+          : validate(value)
+            ? // The draft is bad but the saved value is fine -- nothing broke.
+              `${invalidMessage} Still using "${value}".`
+            : // The saved value itself is unusable; say what happens instead.
+              `${invalidMessage} Falling back to your browser default until this is fixed.`}
+      </span>
+    </div>
   );
 }
 

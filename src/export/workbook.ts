@@ -1,6 +1,7 @@
 import type { Row } from 'exceljs';
 import { db } from '@/db/schema';
 import { groupByStore, outOfStockValue } from '@/domain/grocery';
+import { safeLocale } from '@/domain/format';
 import {
   STOCK_LABEL,
   daysLeft,
@@ -391,7 +392,7 @@ function csvCell(value: unknown): string {
 
 function currencySymbol(settings: Settings): string {
   try {
-    const parts = new Intl.NumberFormat(settings.locale, {
+    const parts = new Intl.NumberFormat(safeLocale(settings.locale), {
       style: 'currency',
       currency: settings.currency,
     }).formatToParts(0);
@@ -403,7 +404,7 @@ function currencySymbol(settings: Settings): string {
 
 function formatMoney(value: number, settings: Settings): string {
   try {
-    return new Intl.NumberFormat(settings.locale, {
+    return new Intl.NumberFormat(safeLocale(settings.locale), {
       style: 'currency',
       currency: settings.currency,
     }).format(value);

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastProvider } from '@/components/ui';
 import { useApplyTheme } from '@/hooks/useTheme';
 import { useSettings } from '@/hooks/useData';
@@ -38,8 +39,9 @@ export function App() {
   useApplyTheme(settings);
 
   return (
-    <ToastProvider>
-      {/*
+    <ErrorBoundary>
+      <ToastProvider>
+        {/*
         HashRouter rather than BrowserRouter: this is a local-first app that may
         be opened straight off the filesystem or from a static host with no
         rewrite rules, and hash routing works in both without configuration.
@@ -93,6 +95,7 @@ export function App() {
           </Route>
         </Routes>
       </HashRouter>
-    </ToastProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
