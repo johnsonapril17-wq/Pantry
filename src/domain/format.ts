@@ -58,14 +58,30 @@ function moneyFormatter(locale: string, currency: string): Intl.NumberFormat {
   if (!f) {
     const tag = safeLocale(locale);
     try {
-      f = new Intl.NumberFormat(tag, { style: 'currency', currency });
+      // `narrowSymbol` gives "$12.50" rather than "A$12.50".
+      //
+      // By default Intl disambiguates a currency that is not the locale's own
+      // by prefixing the country -- A$, CA$, US$ -- which is correct for
+      // international documents and noise in a household pantry app that only
+      // ever deals in one currency.
+      f = new Intl.NumberFormat(tag, {
+        style: 'currency',
+        currency,
+        currencyDisplay: 'narrowSymbol',
+      });
     } catch {
-      // Bad currency code as well as a bad locale: fall back to plain numbers
-      // with a currency-shaped format rather than showing nothing.
       try {
-        f = new Intl.NumberFormat(tag, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // `narrowSymbol` is unsupported on some older engines. Keep the symbol
+        // -- an "A$" prefix beats losing the currency altogether.
+        f = new Intl.NumberFormat(tag, { style: 'currency', currency });
       } catch {
-        f = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+        // The currency code itself is unusable. Fall back to plain 2dp numbers
+        // rather than showing nothing at all.
+        try {
+          f = new Intl.NumberFormat(tag, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        } catch {
+          f = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+        }
       }
     }
     moneyCache.set(key, f);

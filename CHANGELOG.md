@@ -30,6 +30,14 @@ Notable changes to Pantry Tracker. Format follows
   the session and never appears on an empty app.
 - Full JSON exports now record a backup timestamp, so the reminder resets.
 
+### Changed
+
+- Money is shown with the narrow currency symbol, so amounts read `$12.50`
+  rather than `A$12.50`. Intl prefixes the country whenever the currency is not
+  the locale's own, which is right for international documents and noise in a
+  household app that only deals in one currency. Applies to the Excel export
+  too, so spreadsheets match the screen.
+
 ### Fixed
 
 - Data loss was possible with no warning of any kind. The app stored everything

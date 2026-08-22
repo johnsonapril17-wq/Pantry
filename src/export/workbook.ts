@@ -390,11 +390,14 @@ function csvCell(value: unknown): string {
 
 /* -------------------------------------------------------------------------- */
 
+// `narrowSymbol` keeps the exported spreadsheet consistent with the app: a
+// bare "$", not "A$". See the note in domain/format.ts.
 function currencySymbol(settings: Settings): string {
   try {
     const parts = new Intl.NumberFormat(safeLocale(settings.locale), {
       style: 'currency',
       currency: settings.currency,
+      currencyDisplay: 'narrowSymbol',
     }).formatToParts(0);
     return parts.find((p) => p.type === 'currency')?.value ?? '$';
   } catch {
@@ -407,6 +410,7 @@ function formatMoney(value: number, settings: Settings): string {
     return new Intl.NumberFormat(safeLocale(settings.locale), {
       style: 'currency',
       currency: settings.currency,
+      currencyDisplay: 'narrowSymbol',
     }).format(value);
   } catch {
     return value.toFixed(2);
