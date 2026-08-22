@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { db, now, uid } from '@/db/schema';
 import type { Item, ItemKind } from '@/domain/types';
 import { syncAutoGrocery } from '@/domain/grocery';
-import { useCategories, useLocations, useStores } from '@/hooks/useData';
+import { useCategories, useLocations, useSettings, useStores } from '@/hooks/useData';
+import { useItemTemplates, type ItemTemplate } from '@/hooks/useItemTemplates';
 import { Field, Modal, useToast } from './ui';
+import { ItemPicker } from './ItemPicker';
 import { toISODate } from '@/domain/stock';
 
 /** Units offered in the dropdown. Free text is allowed too. */
@@ -67,7 +69,9 @@ export function ItemForm({
   const categories = useCategories();
   const locations = useLocations();
   const stores = useStores();
+  const settings = useSettings();
   const toast = useToast();
+  const allTemplates = useItemTemplates(kind);
 
   const [draft, setDraft] = useState<Draft | null>(null);
 
@@ -82,6 +86,43 @@ export function ItemForm({
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => (d ? { ...d, [key]: value } : d));
+
+  // When editing, the item being edited is not a useful suggestion for itself.
+  const templates = item
+    ? allTemplates.filter((t) => t.name.toLowerCase() !== item.name.trim().toLowerCase())
+    : allTemplates;
+
+  /**
+   * Refill the form from a product entered before.
+   *
+   * Quantity is deliberately left alone -- it is the one thing that really is
+   * different every time, and clobbering what the user just typed would be
+   * infuriating. Expiry is rebuilt from the remembered shelf life rather than
+   * copied, so a new carton of milk is not born expired.
+   */
+  const applyTemplate = (t: ItemTemplate) => {
+    setDraft((d) =>
+      d
+        ? {
+            ...d,
+            name: t.name,
+            unit: t.unit,
+            categoryId: t.categoryId,
+            locationId: t.locationId,
+            storeId: t.storeId,
+            price: t.price,
+            lowThreshold: t.lowThreshold,
+            restockTo: t.restockTo,
+            notes: t.notes ?? '',
+            recipe: t.recipe,
+            portions: t.portions ?? d.portions,
+            expiry: t.shelfLifeDays
+              ? toISODate(new Date(Date.now() + t.shelfLifeDays * 86_400_000))
+              : d.expiry,
+          }
+        : d,
+    );
+  };
 
   const save = async () => {
     const name = draft.name.trim();
@@ -123,16 +164,26 @@ export function ItemForm({
       }
     >
       <div className="form-grid">
-        <Field label="Item / Food" span>
-          <input
-            className="input"
+        <Field
+          label="Item / Food"
+          span
+          hint={
+            templates.length > 0
+              ? 'Pick something you have bought before to refill everything but the quantity.'
+              : undefined
+          }
+        >
+          <ItemPicker
             value={draft.name}
-            autoFocus
+            templates={templates}
             placeholder={isPantry ? 'e.g. Plain flour' : 'e.g. Bread & butter pickles'}
-            onChange={(e) => set('name', e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') save();
-            }}
+            locale={settings.locale}
+            currency={settings.currency}
+            categoryName={(id) => categories.find((c) => c.id === id)?.name ?? ''}
+            locationName={(id) => locations.find((l) => l.id === id)?.name ?? ''}
+            onChange={(name) => set('name', name)}
+            onPick={applyTemplate}
+            onSubmit={save}
           />
         </Field>
 

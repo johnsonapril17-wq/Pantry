@@ -8,6 +8,16 @@ Notable changes to Pantry Tracker. Format follows
 
 ### Added
 
+- **Item / Food is now a dropdown of everything entered before.** Picking a
+  previous product refills the whole form — unit, category, location, store,
+  price, low threshold and restock target — leaving only the quantity for you.
+  You can still type a brand new name; the list simply gets out of the way.
+  Each suggestion shows its category, location, last price and how long it
+  kept, so you can tell two similar entries apart.
+- Expiry is rebuilt from the *shelf life* remembered for that product rather
+  than copying the old date forward, so a newly bought item is not created
+  already expired.
+
 - **Persistent storage request.** The app now calls `navigator.storage.persist()`
   on boot. Without it IndexedDB is best-effort storage, which the browser may
   evict during routine cleanup — silently, and with no way to recover. Note
