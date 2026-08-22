@@ -6,7 +6,25 @@ Notable changes to Pantry Tracker. Format follows
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Persistent storage request.** The app now calls `navigator.storage.persist()`
+  on boot. Without it IndexedDB is best-effort storage, which the browser may
+  evict during routine cleanup — silently, and with no way to recover. Note
+  that this is a request: browsers only grant it to sites they consider
+  established, so bookmarking or installing the app matters.
+- **Storage & safety panel** in Settings showing whether storage is permanent,
+  how much space is used, and when the last backup was taken.
+- **Warning banner** shown across the app when storage is not permanent, or
+  when there is data and no backup in the last 14 days. It is dismissible for
+  the session and never appears on an empty app.
+- Full JSON exports now record a backup timestamp, so the reminder resets.
+
+### Fixed
+
+- Data loss was possible with no warning of any kind. The app stored everything
+  in non-persistent IndexedDB, kept backup buried in Settings, and never
+  explained that data is tied to one browser at one address.
 
 ## [0.1.0] — 2026-08-22
 

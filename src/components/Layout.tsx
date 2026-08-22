@@ -2,6 +2,7 @@ import { createContext, type ReactNode, useContext, useEffect, useState } from '
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Menu, Moon, Package, Sun } from 'lucide-react';
 import { Icon } from './icons';
+import { StorageBanner } from './StorageBanner';
 import { useGrocery, useItems, useSettings } from '@/hooks/useData';
 import { resolveMode, setMode } from '@/hooks/useTheme';
 import { stockStatus } from '@/domain/stock';
@@ -182,7 +183,10 @@ export function Page({
         </div>
       </header>
 
-      <div className="content">{children}</div>
+      <div className="content">
+        <StorageBanner />
+        {children}
+      </div>
     </>
   );
 }

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { ensureSeeded } from './db/seed';
 import { syncAutoGrocery } from './domain/grocery';
+import { requestPersistentStorage } from './domain/storage';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
@@ -17,6 +18,11 @@ if (!root) throw new Error('Root element missing from index.html');
 // The grocery sync runs on boot as well as after every item change: data can
 // reach the database without going through the UI (a restored backup, a demo
 // load, another tab), and the list has to reflect that the moment you open it.
+// Ask the browser not to evict this database. Without this, IndexedDB is
+// best-effort storage and can be cleared during routine browser cleanup --
+// which is how a full pantry disappears after a restart.
+void requestPersistentStorage();
+
 ensureSeeded()
   .then(() => syncAutoGrocery())
   .catch((err) => console.error('Startup failed:', err))

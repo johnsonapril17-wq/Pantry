@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Download,
   ExternalLink,
@@ -22,6 +22,9 @@ import { buildPantryCsv, buildWorkbook, download } from '@/export/workbook';
 import { exportBackup, importBackup } from '@/export/backup';
 import { isValidCurrency, isValidLocale } from '@/domain/format';
 import { APP_VERSION, CHANGELOG_URL, REPO_URL } from '@/domain/meta';
+import { markBackedUp } from '@/components/StorageBanner';
+import { formatBytes, getStorageInfo, requestPersistentStorage, type StorageInfo } from '@/domain/storage';
+import { mediumDate } from '@/domain/format';
 import type { ModeSetting } from '@/domain/types';
 
 export function Settings() {
@@ -50,6 +53,9 @@ export function Settings() {
         download(await buildPantryCsv(settings), `pantry-${stamp}.csv`);
       } else {
         download(await exportBackup(), `pantry-tracker-backup-${stamp}.json`);
+        // Only a full backup counts as a safe copy; the spreadsheet exports
+        // are lossy and cannot be restored from.
+        await markBackedUp();
       }
       toast('Export ready.', 'ok');
     } catch (err) {
@@ -214,6 +220,9 @@ export function Settings() {
       <ReferenceLists />
 
       {/* ---------------------------------------------------------------- */}
+      <StorageSection lastBackupAt={settings.lastBackupAt} locale={settings.locale} />
+
+      {/* ---------------------------------------------------------------- */}
       <section className="card">
         <div className="card-head">
           <div>
@@ -320,6 +329,109 @@ export function Settings() {
         </a>
       </div>
     </Page>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Where your data lives, and whether it is safe                              */
+/* -------------------------------------------------------------------------- */
+
+function StorageSection({
+  lastBackupAt,
+  locale,
+}: {
+  lastBackupAt?: string;
+  locale: string;
+}) {
+  const [info, setInfo] = useState<StorageInfo | null>(null);
+  const [asking, setAsking] = useState(false);
+  const toast = useToast();
+
+  const refresh = () => getStorageInfo().then(setInfo);
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2>Storage & safety</h2>
+          <div className="small muted">
+            All your data is held by this browser, at this exact address. It is not on a
+            server, and it does not follow you to another browser or device.
+          </div>
+        </div>
+      </div>
+
+      <div className="card-body col" style={{ gap: 'var(--space-4)' }}>
+        <div className="row-between wrap" style={{ gap: 'var(--space-3)' }}>
+          <div className="row" style={{ gap: 'var(--space-3)' }}>
+            <span className="dot" data-tone={info?.persisted ? 'ok' : 'danger'} />
+            <div>
+              <div className="strong small">
+                {info === null
+                  ? 'Checking...'
+                  : info.persisted
+                    ? 'Storage is permanent'
+                    : 'Storage is temporary'}
+              </div>
+              <div className="tiny muted">
+                {info?.persisted
+                  ? 'The browser has agreed not to clear this data on its own.'
+                  : 'The browser is allowed to delete this data during cleanup, without warning.'}
+              </div>
+              {info && !info.persisted && (
+                <div className="tiny muted" style={{ marginTop: 4, maxWidth: 460 }}>
+                  Browsers only grant permanent storage to sites they consider established.
+                  Bookmarking this page, or installing it as an app, usually earns it. Until
+                  then, treat a backup as the only real safety net.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {info && !info.persisted && (
+            <button
+              className="btn btn-sm btn-primary"
+              disabled={asking}
+              onClick={async () => {
+                setAsking(true);
+                const ok = await requestPersistentStorage();
+                await refresh();
+                setAsking(false);
+                toast(
+                  ok
+                    ? 'Storage is now permanent.'
+                    : 'The browser declined. Bookmarking or installing the app usually earns it.',
+                  ok ? 'ok' : 'danger',
+                );
+              }}
+            >
+              {asking ? 'Asking...' : 'Make permanent'}
+            </button>
+          )}
+        </div>
+
+        <hr className="divider" style={{ margin: 0 }} />
+
+        <div className="row-between wrap" style={{ gap: 'var(--space-3)' }}>
+          <div>
+            <div className="strong small">
+              {lastBackupAt
+                ? `Last backup ${mediumDate(lastBackupAt.slice(0, 10), locale)}`
+                : 'No backup taken yet'}
+            </div>
+            <div className="tiny muted">
+              A backup is the only copy that survives clearing site data or losing this machine.
+            </div>
+          </div>
+          <span className="small muted num">
+            {info ? `${formatBytes(info.usageBytes)} used of ${formatBytes(info.quotaBytes)}` : ''}
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 

@@ -172,6 +172,8 @@ export interface Settings {
   /** Day the budget week rolls over. 0 = Sunday. */
   weekStartsOn: number;
   seeded?: boolean;
+  /** ISO timestamp of the last successful backup export. Drives the reminder. */
+  lastBackupAt?: string;
 }
 
 /** A printed stocktake sheet, so a scanned code can be matched back to rows. */
