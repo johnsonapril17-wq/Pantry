@@ -1,0 +1,236 @@
+/* ---------------------------------------------------------------------------
+   Printable trackers.
+
+   From the notes (photo 03): "have printable trackers that can be scanned into
+   the app to update quantities". The sheet is deliberately monochrome -- it has
+   to survive a cheap inkjet and a phone camera -- so it does NOT use the theme
+   tokens. Everything here is black on white by design.
+--------------------------------------------------------------------------- */
+
+.print-sheet {
+  background: #fff;
+  color: #000;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm 12mm 14mm;
+  margin: 0 auto var(--space-5);
+  box-shadow: var(--shadow-2);
+  border-radius: 2px;
+}
+
+.print-sheet + .print-sheet {
+  page-break-before: always;
+}
+
+.print-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8mm;
+  border-bottom: 2px solid #000;
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+
+.print-head h1 {
+  font-size: 18pt;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  font-family: inherit;
+  color: #000;
+}
+
+.print-head .meta {
+  font-size: 8.5pt;
+  color: #333;
+  margin-top: 1.5mm;
+  line-height: 1.45;
+}
+
+.print-head .qr {
+  text-align: center;
+  flex: none;
+}
+
+.print-head .qr img {
+  width: 24mm;
+  height: 24mm;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.print-head .qr .cap {
+  font-size: 6.5pt;
+  color: #444;
+  margin-top: 1mm;
+  letter-spacing: 0.04em;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.print-table th {
+  text-align: left;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1.5px solid #000;
+  padding: 1.6mm 1.5mm;
+  background: #f0f0f0;
+  color: #000;
+}
+
+.print-table td {
+  border-bottom: 0.75px solid #bbb;
+  padding: 0;
+  height: 9mm;
+  vertical-align: middle;
+  color: #000;
+}
+
+.print-table td .cell {
+  padding: 0 1.5mm;
+}
+
+.print-table tbody tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+/* The column the user writes the new count into. */
+.print-table td.write {
+  border-left: 0.75px solid #bbb;
+  background: #fff !important;
+  min-width: 22mm;
+}
+
+.print-table td.write .box {
+  border: 0.75px dashed #999;
+  height: 6.5mm;
+  margin: 1.2mm;
+  border-radius: 1mm;
+}
+
+.print-table .rowcode {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 7pt;
+  color: #666;
+  letter-spacing: 0.05em;
+}
+
+.print-table .qty-now {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.print-table .tick {
+  width: 5mm;
+  height: 5mm;
+  border: 0.9px solid #000;
+  border-radius: 1mm;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.print-group td {
+  background: #e6e6e6 !important;
+  font-size: 7.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  height: 6.5mm;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.print-foot {
+  margin-top: 4mm;
+  padding-top: 2.5mm;
+  border-top: 1px solid #000;
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  color: #444;
+}
+
+.print-instructions {
+  font-size: 8pt;
+  color: #333;
+  border: 0.75px solid #999;
+  border-radius: 1.5mm;
+  padding: 2.5mm 3mm;
+  margin-bottom: 4mm;
+  background: #f7f7f7;
+  line-height: 1.5;
+}
+
+.print-instructions b {
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Actual printing: hide the whole application chrome, show only the sheets.
+-------------------------------------------------------------------------- */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    height: auto !important;
+  }
+
+  .app {
+    display: block !important;
+    height: auto !important;
+  }
+
+  .sidebar,
+  .topbar,
+  .no-print,
+  .toast-stack,
+  .scrim {
+    display: none !important;
+  }
+
+  .main,
+  .content {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+
+  .content > * + * {
+    margin-top: 0 !important;
+  }
+
+  .print-sheet {
+    box-shadow: none;
+    margin: 0;
+    width: auto;
+    min-height: auto;
+    border-radius: 0;
+  }
+
+  .print-table {
+    page-break-inside: auto;
+  }
+
+  .print-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .print-table thead {
+    display: table-header-group;
+  }
+}
