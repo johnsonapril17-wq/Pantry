@@ -14,22 +14,22 @@ export const THEMES: {
     id: 'farmers-market',
     name: 'Farmers Market',
     tagline: 'Organic & fresh',
-    light: ['#faf6ec', '#fffdf7', '#4d7c0f', '#b45309', '#b3261e'],
-    dark: ['#191b15', '#232620', '#a3e635', '#fbbf24', '#f87171'],
+    light: ['#fefae0', '#fffef5', '#606c38', '#bc6c25', '#b22222'],
+    dark: ['#191c12', '#23271a', '#8faf8f', '#f4c430', '#e2725b'],
   },
   {
     id: 'modern-bistro',
     name: 'Modern Bistro',
     tagline: 'High contrast & bold',
-    light: ['#f7f7f5', '#ffffff', '#a4161a', '#8a5a00', '#0b0b0d'],
-    dark: ['#0a0a0b', '#141417', '#ef4444', '#fbbf24', '#f8f8fa'],
+    light: ['#f3f4f2', '#ffffff', '#2c3e50', '#bc6c25', '#b22222'],
+    dark: ['#0e131a', '#18202b', '#e2725b', '#f4c430', '#e05252'],
   },
   {
     id: 'minimalist',
     name: 'Minimalist',
     tagline: 'Clean & airy',
-    light: ['#ffffff', '#fafafa', '#18181b', '#a16207', '#be123c'],
-    dark: ['#0e0e0f', '#171719', '#f4f4f5', '#fbbf24', '#fb7185'],
+    light: ['#ffffff', '#f7f8fa', '#5f6b85', '#bc6c25', '#b22222'],
+    dark: ['#101215', '#191c21', '#8e9aaf', '#f4c430', '#e2725b'],
   },
 ];
 

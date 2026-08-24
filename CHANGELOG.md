@@ -8,6 +8,18 @@ Notable changes to Pantry Tracker. Format follows
 
 ### Changed
 
+- **All three themes are rebuilt on your Gemini colour swatch.** The twelve
+  colours from the Krita swatch are split so the themes stay distinguishable:
+  Farmers Market takes the greens and warm papers (olive, fern, cornsilk,
+  beige), Modern Bistro sets navy against terracotta, and Minimalist takes the
+  cool greys and mint. Tints, shades and every soft pair are derived from those
+  twelve -- a flat swatch cannot supply a dark-mode surface ramp, and text on a
+  soft background needs a shade dark enough to read. Verified at 96/96 contrast
+  checks across all six theme/mode combinations. The theme preview swatches in
+  Settings and the Excel export fills were updated to match.
+
+### Changed
+
 - **Tins & Jars, Herbs & Spices and Baking are now part of Pantry Staples.**
   Four ambient categories where one does the job; the grocery list groups more
   tightly and the item form has a shorter dropdown. Existing items, grocery

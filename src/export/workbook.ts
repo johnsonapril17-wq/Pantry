@@ -20,13 +20,17 @@ import type { Settings } from '@/domain/types';
  * directly in Excel, and uploads to Google Sheets unchanged.
  */
 
-/** Fill colours matching the in-app status tones. */
+/**
+ * Fill colours matching the in-app status tones, taken from the Farmers Market
+ * light palette in tokens.css -- a spreadsheet has no dark mode, so the light
+ * soft-tints are the ones to mirror.
+ */
 const FILL = {
-  ok: 'FFE3F0C9',
-  warn: 'FFFBECCD',
-  danger: 'FFF9DEDB',
-  header: 'FF3F6212',
-  group: 'FFEFEFE9',
+  ok: 'FFDEECD7',
+  warn: 'FFF8E5D0',
+  danger: 'FFF8DCDC',
+  header: 'FF606C38',
+  group: 'FFF5F5DC',
 } as const;
 
 const HEADER_FONT = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
