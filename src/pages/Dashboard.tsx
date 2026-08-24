@@ -241,6 +241,13 @@ export function Dashboard() {
                       <tr key={i.id} data-expired={st === 'expired'}>
                         <td>
                           <span className="row" style={{ gap: 8 }}>
+                            <span
+                              className="dot category-dot"
+                              style={{
+                                background: cats.get(i.categoryId)?.colour ?? 'var(--text-faint)',
+                              }}
+                              aria-hidden="true"
+                            />
                             <Icon name={cats.get(i.categoryId)?.icon} size={14} />
                             <span className="item-name">{i.name}</span>
                           </span>

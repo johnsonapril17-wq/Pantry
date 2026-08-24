@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarCheck, Minus, Package, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CategoryTag } from '@/components/CategoryTag';
 import { Page } from '@/components/Layout';
-import { Icon } from '@/components/icons';
 import {
   Badge,
   ConfirmDialog,
@@ -313,10 +313,7 @@ export function Pantry() {
                         </td>
 
                         <td className="small">
-                          <span className="row" style={{ gap: 6 }}>
-                            <Icon name={cat?.icon} size={14} />
-                            {cat?.name ?? '--'}
-                          </span>
+                          <CategoryTag category={cat} />
                         </td>
 
                         <td className="small muted">{locs.get(item.locationId)?.name ?? '--'}</td>

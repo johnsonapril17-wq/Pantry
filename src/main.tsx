@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { runMigrations } from './db/migrations';
 import { ensureSeeded } from './db/seed';
 import { syncAutoGrocery } from './domain/grocery';
 import { requestPersistentStorage } from './domain/storage';
@@ -47,8 +48,12 @@ void requestPersistentStorage();
  * data can reach the database without going through the UI -- a restored
  * backup, a demo load, another tab -- and the list has to reflect that the
  * moment you open it.
+ *
+ * Migrations sit between the two: they can only run once reference data exists,
+ * and the grocery sync must see the categories they rewrite.
  */
 ensureSeeded()
+  .then(() => runMigrations())
   .then(() => syncAutoGrocery())
   .catch((err) => console.error('Startup failed:', err))
   .finally(() => {

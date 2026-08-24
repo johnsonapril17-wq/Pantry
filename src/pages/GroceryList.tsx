@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Check, Plus, RefreshCw, ShoppingCart, Sparkles, Trash2, Undo2 } from 'lucide-react';
+import { CategoryTag } from '@/components/CategoryTag';
 import { Page } from '@/components/Layout';
-import { Icon } from '@/components/icons';
 import {
   Badge,
   ConfirmDialog,
@@ -239,10 +239,7 @@ export function GroceryList() {
                               : money(e.price * e.qty, settings.locale, settings.currency)}
                           </td>
                           <td className="small">
-                            <span className="row" style={{ gap: 6 }}>
-                              <Icon name={cats.get(e.categoryId)?.icon} size={14} />
-                              {cats.get(e.categoryId)?.name ?? '--'}
-                            </span>
+                            <CategoryTag category={cats.get(e.categoryId)} />
                           </td>
                           <td>
                             <Badge tone={e.source === 'auto' ? 'accent' : 'neutral'}>

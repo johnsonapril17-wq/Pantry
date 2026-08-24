@@ -85,7 +85,7 @@ src/
   styles/      tokens.css (themes) + base + components + print.
 ```
 
-Three things are worth knowing before changing anything:
+Four things are worth knowing before changing anything:
 
 1. **Stock status is never stored.** `stockStatus()` derives it from `qty` and
    `lowThreshold` every time. Storing it would let it drift out of step with the
@@ -98,6 +98,16 @@ Three things are worth knowing before changing anything:
 3. **Every colour comes from a token.** `styles/components.css` contains no
    literal colours. That is what keeps six theme/mode combinations honest; a
    hard-coded hex will look wrong in five of them.
+
+   The one deliberate exception is category swatches, whose colours are *data*
+   and so live in `db/seed.ts` -- the same as store colours. They stay the same
+   hex in every theme, because the colour is the category's identifier; what
+   flips per theme is the ring around the swatch, drawn with `--border`.
+
+4. **Changing `db/seed.ts` does nothing to existing databases.** `ensureSeeded()`
+   returns early once `settings.seeded` is set, so edits to the seed arrays only
+   reach new installs. Anything that must reach data already on disk belongs in
+   `db/migrations.ts`, guarded by `settings.schemaVersion`.
 
 ## Data and privacy
 

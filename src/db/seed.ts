@@ -12,19 +12,31 @@ import { syncAutoGrocery } from '@/domain/grocery';
  * from the demo set below and from tests.
  */
 
+/*
+ * Colours are hue-spaced so a full list reads at a glance, and are mid-tone so
+ * the same hex works as a swatch on both the light and the dark surface. They
+ * live here as data rather than in CSS because categories are user-editable --
+ * `components.css` still holds no literal colours.
+ */
 const CATEGORIES: Category[] = [
-  { id: 'cat-produce', name: 'Fruit & Veg', department: 'Fresh', sortOrder: 10, icon: 'apple' },
-  { id: 'cat-meat', name: 'Meat & Seafood', department: 'Fresh', sortOrder: 20, icon: 'beef' },
-  { id: 'cat-dairy', name: 'Dairy & Eggs', department: 'Fresh', sortOrder: 30, icon: 'milk' },
-  { id: 'cat-bakery', name: 'Bakery', department: 'Fresh', sortOrder: 40, icon: 'croissant' },
-  { id: 'cat-pantry', name: 'Pantry Staples', department: 'Ambient', sortOrder: 50, icon: 'wheat' },
-  { id: 'cat-tins', name: 'Tins & Jars', department: 'Ambient', sortOrder: 60, icon: 'can' },
-  { id: 'cat-spices', name: 'Herbs & Spices', department: 'Ambient', sortOrder: 70, icon: 'leaf' },
-  { id: 'cat-baking', name: 'Baking', department: 'Ambient', sortOrder: 80, icon: 'cake' },
-  { id: 'cat-snacks', name: 'Snacks', department: 'Ambient', sortOrder: 90, icon: 'cookie' },
-  { id: 'cat-drinks', name: 'Drinks', department: 'Ambient', sortOrder: 100, icon: 'cup' },
-  { id: 'cat-frozen', name: 'Frozen', department: 'Frozen', sortOrder: 110, icon: 'snowflake' },
-  { id: 'cat-household', name: 'Household', department: 'Non-food', sortOrder: 120, icon: 'spray' },
+  // prettier-ignore
+  { id: 'cat-produce', name: 'Fruit & Veg', department: 'Fresh', sortOrder: 10, icon: 'apple', colour: '#16a34a' },
+  // prettier-ignore
+  { id: 'cat-meat', name: 'Meat & Seafood', department: 'Fresh', sortOrder: 20, icon: 'beef', colour: '#dc2626' },
+  // prettier-ignore
+  { id: 'cat-dairy', name: 'Dairy & Eggs', department: 'Fresh', sortOrder: 30, icon: 'milk', colour: '#2563eb' },
+  // prettier-ignore
+  { id: 'cat-bakery', name: 'Bakery', department: 'Fresh', sortOrder: 40, icon: 'croissant', colour: '#d97706' },
+  // prettier-ignore
+  { id: 'cat-pantry', name: 'Pantry Staples', department: 'Ambient', sortOrder: 50, icon: 'wheat', colour: '#8b5cf6' },
+  // prettier-ignore
+  { id: 'cat-snacks', name: 'Snacks', department: 'Ambient', sortOrder: 90, icon: 'cookie', colour: '#db2777' },
+  // prettier-ignore
+  { id: 'cat-drinks', name: 'Drinks', department: 'Ambient', sortOrder: 100, icon: 'cup', colour: '#0d9488' },
+  // prettier-ignore
+  { id: 'cat-frozen', name: 'Frozen', department: 'Frozen', sortOrder: 110, icon: 'snowflake', colour: '#0ea5e9' },
+  // prettier-ignore
+  { id: 'cat-household', name: 'Household', department: 'Non-food', sortOrder: 120, icon: 'spray', colour: '#64748b' },
 ];
 
 const LOCATIONS: Location[] = [
@@ -48,9 +60,6 @@ const STORES: Store[] = [
       'cat-meat',
       'cat-dairy',
       'cat-pantry',
-      'cat-tins',
-      'cat-spices',
-      'cat-baking',
       'cat-snacks',
       'cat-drinks',
       'cat-household',
@@ -102,11 +111,11 @@ type DemoRow = [
 
 const DEMO_PANTRY: DemoRow[] = [
   ['Plain flour', 2, 'kg', 'cat-pantry', 'loc-pantry', 3.2, 1, 240],
-  ['Caster sugar', 1, 'kg', 'cat-baking', 'loc-pantry', 2.6, 1, 400],
+  ['Caster sugar', 1, 'kg', 'cat-pantry', 'loc-pantry', 2.6, 1, 400],
   ['Olive oil', 0, 'L', 'cat-pantry', 'loc-pantry', 12.5, 1, 500],
   ['Basmati rice', 4, 'kg', 'cat-pantry', 'loc-pantry', 4.8, 2, 300],
-  ['Tinned tomatoes', 3, 'can', 'cat-tins', 'loc-pantry', 1.1, 6, 420],
-  ['Chickpeas', 1, 'can', 'cat-tins', 'loc-pantry', 1.35, 4, 380],
+  ['Tinned tomatoes', 3, 'can', 'cat-pantry', 'loc-pantry', 1.1, 6, 420],
+  ['Chickpeas', 1, 'can', 'cat-pantry', 'loc-pantry', 1.35, 4, 380],
   ['Milk', 2, 'L', 'cat-dairy', 'loc-fridge', 3.1, 2, 5],
   ['Butter', 1, 'block', 'cat-dairy', 'loc-fridge', 6.5, 1, 40],
   ['Free range eggs', 6, 'ea', 'cat-dairy', 'loc-fridge', 0.65, 6, 12],
@@ -117,8 +126,8 @@ const DEMO_PANTRY: DemoRow[] = [
   ['Bananas', 5, 'ea', 'cat-produce', 'loc-cupboard', 0.55, 3, 4],
   ['Baby spinach', 1, 'bag', 'cat-produce', 'loc-fridge', 4.0, 1, -1],
   ['Brown onions', 4, 'ea', 'cat-produce', 'loc-pantry', 0.7, 3, 25],
-  ['Cumin seeds', 1, 'jar', 'cat-spices', 'loc-cupboard', 3.4, 1, 500],
-  ['Smoked paprika', 0, 'jar', 'cat-spices', 'loc-cupboard', 4.2, 1, null],
+  ['Cumin seeds', 1, 'jar', 'cat-pantry', 'loc-cupboard', 3.4, 1, 500],
+  ['Smoked paprika', 0, 'jar', 'cat-pantry', 'loc-cupboard', 4.2, 1, null],
   ['Peas', 2, 'bag', 'cat-frozen', 'loc-freezer', 3.0, 1, 200],
   ['Dishwasher tablets', 1, 'box', 'cat-household', 'loc-cupboard', 14.0, 1, null],
   ['Coffee beans', 1, 'bag', 'cat-drinks', 'loc-pantry', 18.0, 1, 60],
@@ -153,7 +162,7 @@ export async function loadDemoData(): Promise<void> {
       name: 'Bread & butter pickles',
       qty: 4,
       unit: 'jar',
-      categoryId: 'cat-tins',
+      categoryId: 'cat-pantry',
       locationId: 'loc-pantry',
       lowThreshold: 1,
       batchDate: offsetDate(-30),
@@ -168,7 +177,7 @@ export async function loadDemoData(): Promise<void> {
       name: 'Fig jam',
       qty: 2,
       unit: 'jar',
-      categoryId: 'cat-tins',
+      categoryId: 'cat-pantry',
       locationId: 'loc-pantry',
       lowThreshold: 2,
       batchDate: offsetDate(-60),

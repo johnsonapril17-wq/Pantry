@@ -1,8 +1,8 @@
 import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PackageCheck, PackageX, Plus, ShoppingCart } from 'lucide-react';
+import { CategoryTag } from '@/components/CategoryTag';
 import { Page } from '@/components/Layout';
-import { Icon } from '@/components/icons';
 import { Badge, EmptyState, SegmentedControl, Stat, useToast } from '@/components/ui';
 import { db, now } from '@/db/schema';
 import { byId, useCategories, useGrocery, useItems, useSettings, useStores } from '@/hooks/useData';
@@ -236,10 +236,7 @@ export function OutOfStock() {
                                   )}
                             </td>
                             <td className="small">
-                              <span className="row" style={{ gap: 6 }}>
-                                <Icon name={cats.get(item.categoryId)?.icon} size={14} />
-                                {cats.get(item.categoryId)?.name ?? '--'}
-                              </span>
+                              <CategoryTag category={cats.get(item.categoryId)} />
                             </td>
                             <td>
                               <Badge tone={status === 'out' ? 'danger' : 'warn'}>

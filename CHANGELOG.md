@@ -6,6 +6,25 @@ Notable changes to Pantry Tracker. Format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Tins & Jars, Herbs & Spices and Baking are now part of Pantry Staples.**
+  Four ambient categories where one does the job; the grocery list groups more
+  tightly and the item form has a shorter dropdown. Existing items, grocery
+  lines, spends and store aisle orders are moved across automatically, so
+  nothing loses its category.
+
+### Added
+
+- **Categories are colour coded.** Every category carries a swatch colour shown
+  beside its name on the pantry, grocery, out-of-stock and dashboard lists, so a
+  long list can be scanned by eye rather than read. Colours are editable per
+  category in Settings, and print.
+- A one-time data migration layer (`src/db/migrations.ts`), stamped by
+  `settings.schemaVersion`. Changing the seed arrays only ever affected new
+  databases; anything that has to reach existing data now has a home.
+
+
 ### Added
 
 - **Item / Food is now a dropdown of everything entered before.** Picking a

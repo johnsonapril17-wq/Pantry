@@ -64,6 +64,14 @@ export interface Category {
   sortOrder: number;
   /** Key into `src/components/icons.tsx`. */
   icon: string;
+  /**
+   * Hex swatch colour used to tag the category everywhere it is listed.
+   *
+   * Optional because categories you add yourself may not have one, and because
+   * databases seeded before colours existed are backfilled by migration rather
+   * than rewritten. Render sites fall back to `--text-faint`.
+   */
+  colour?: string;
 }
 
 export interface Location {
@@ -172,6 +180,11 @@ export interface Settings {
   /** Day the budget week rolls over. 0 = Sunday. */
   weekStartsOn: number;
   seeded?: boolean;
+  /**
+   * Data shape this database has been migrated to. Absent means 1, the shape
+   * that shipped before `src/db/migrations.ts` existed.
+   */
+  schemaVersion?: number;
   /** ISO timestamp of the last successful backup export. Drives the reminder. */
   lastBackupAt?: string;
 }

@@ -973,3 +973,52 @@
     z-index: 50;
   }
 }
+
+/* Category colour coding -------------------------------------------------- */
+
+/*
+ * The swatch is the only place a category's own colour appears, and it is
+ * always a fill, never text -- so a user-chosen hue can never drop below text
+ * contrast.
+ *
+ * The ring is what makes the swatch reliable. No single fixed hex can clear the
+ * 3:1 non-text threshold against both a near-white and a near-black surface at
+ * once, so instead of tinting the palette per theme -- which would break the
+ * colour's job as a stable identifier -- the edge does the work. `--border`
+ * already flips with the theme, so the dot keeps a visible outline on all six
+ * theme/mode combinations whatever colour sits inside it.
+ */
+.category-dot {
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.category-tag {
+  white-space: nowrap;
+}
+
+/* Swatch doubling as the colour picker in Settings. */
+.colour-input {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  flex: none;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.colour-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.colour-input::-webkit-color-swatch,
+.colour-input::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}

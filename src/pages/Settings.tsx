@@ -527,6 +527,13 @@ function ReferenceLists() {
   const nextOrder = (rows: { sortOrder: number }[]) =>
     rows.length ? Math.max(...rows.map((r) => r.sortOrder)) + 10 : 10;
 
+  /*
+   * Step around the hue wheel by a large, non-dividing amount so consecutive
+   * new categories land far apart instead of shading into each other. Fixed
+   * saturation and lightness keep them legible on both surfaces.
+   */
+  const nextColour = (rows: unknown[]) => `hsl(${(rows.length * 137) % 360} 62% 45%)`;
+
   return (
     <section className="card">
       <div className="card-head">
@@ -551,6 +558,13 @@ function ReferenceLists() {
               {categories.map((c) => (
                 <div key={c.id} className="row-between">
                   <span className="row small" style={{ gap: 8 }}>
+                    <input
+                      type="color"
+                      className="colour-input"
+                      value={c.colour ?? '#64748b'}
+                      onChange={(e) => db.categories.update(c.id, { colour: e.target.value })}
+                      aria-label={`Colour for ${c.name}`}
+                    />
                     <Icon name={c.icon} size={15} />
                     {c.name}
                     <span className="tiny faint">{c.department}</span>
@@ -586,6 +600,7 @@ function ReferenceLists() {
                     department: 'Ambient',
                     sortOrder: nextOrder(categories),
                     icon: 'tag',
+                    colour: nextColour(categories),
                   });
                   setNewCategory('');
                 }}

@@ -234,3 +234,12 @@
     display: table-header-group;
   }
 }
+
+/*
+ * Category swatches are the fastest way to read a printed list, so force them
+ * to render -- browsers drop background fills from print output by default.
+ */
+.category-dot {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
