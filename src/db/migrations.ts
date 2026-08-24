@@ -13,12 +13,35 @@ import type { Category } from '@/domain/types';
  * will run the whole batch again.
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
-/** Categories folded into Pantry Staples in v2. */
-const MERGED_INTO_PANTRY = ['cat-tins', 'cat-spices', 'cat-baking'];
+/**
+ * Categories folded into Pantry Staples in v2.
+ *
+ * `cat-spices` was in this list when v2 shipped and has since been removed:
+ * Herbs & Spices came back as its own category in v3. Taking it out here means
+ * a database that has not run v2 yet never loses its spice assignments at all,
+ * which is strictly better than merging them and recreating an empty category
+ * a moment later.
+ *
+ * A database that already ran the shipped v2 is a different matter -- see
+ * `restoreSpices()`.
+ */
+const MERGED_INTO_PANTRY = ['cat-tins', 'cat-baking'];
 
 const PANTRY = 'cat-pantry';
+
+const SPICES = 'cat-spices';
+
+/** Herbs & Spices, restored in v3. */
+const SPICES_CATEGORY: Category = {
+  id: SPICES,
+  name: 'Herbs & Spices',
+  department: 'Ambient',
+  sortOrder: 70,
+  icon: 'leaf',
+  colour: '#84cc16',
+};
 
 /** Restored if the target category was deleted by hand before the merge. */
 const PANTRY_FALLBACK: Category = {
@@ -37,6 +60,7 @@ const COLOURS: Record<string, string> = {
   'cat-dairy': '#2563eb',
   'cat-bakery': '#d97706',
   'cat-pantry': '#8b5cf6',
+  'cat-spices': '#84cc16',
   'cat-snacks': '#db2777',
   'cat-drinks': '#0d9488',
   'cat-frozen': '#0ea5e9',
@@ -72,6 +96,7 @@ export async function runMigrations(): Promise<void> {
     [db.items, db.grocery, db.spends, db.categories, db.stores, db.settings],
     async () => {
       await mergeCategories();
+      await restoreSpices();
       await backfillColours();
       await db.settings.update('settings', { schemaVersion: SCHEMA_VERSION });
     },
@@ -118,6 +143,36 @@ async function mergeCategories(): Promise<void> {
   }
 
   await db.categories.bulkDelete(doomed.map((c) => c.id));
+}
+
+/**
+ * Puts Herbs & Spices back as its own category (v3).
+ *
+ * Only the category is restored, never the items. A database that ran the
+ * shipped v2 had its spice items rewritten to `cat-pantry` with no record of
+ * where they came from, so there is nothing to reverse them from -- inventing
+ * a rule like "anything in a jar" would silently move the wrong things, which
+ * is worse than leaving them put. Those items stay in Pantry Staples until
+ * they are reassigned by hand.
+ *
+ * Databases still on v1 keep their assignments outright: `cat-spices` is no
+ * longer in `MERGED_INTO_PANTRY`, so it is never folded away in the first
+ * place, and the add below is skipped because the category still exists.
+ */
+async function restoreSpices(): Promise<void> {
+  if (await db.categories.get(SPICES)) return;
+  await db.categories.add(SPICES_CATEGORY);
+
+  // v2 also stripped the id out of every store's walk order. Without this the
+  // category exists but sorts to the end of the grocery list, behind frozen.
+  for (const store of await db.stores.toArray()) {
+    if (store.aisleOrder.length === 0 || store.aisleOrder.includes(SPICES)) continue;
+
+    const order = [...store.aisleOrder];
+    const after = order.indexOf(PANTRY);
+    order.splice(after === -1 ? order.length : after + 1, 0, SPICES);
+    await db.stores.update(store.id, { aisleOrder: order });
+  }
 }
 
 /** Gives every category a swatch colour, leaving any the user already set. */

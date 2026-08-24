@@ -32,6 +32,7 @@ const CATEGORY_COLOURS = {
   'Dairy & Eggs': '#2563eb',
   Bakery: '#d97706',
   'Pantry Staples': '#8b5cf6',
+  'Herbs & Spices': '#84cc16',
   Snacks: '#db2777',
   Drinks: '#0d9488',
   Frozen: '#0ea5e9',

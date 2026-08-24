@@ -30,6 +30,8 @@ const CATEGORIES: Category[] = [
   // prettier-ignore
   { id: 'cat-pantry', name: 'Pantry Staples', department: 'Ambient', sortOrder: 50, icon: 'wheat', colour: '#8b5cf6' },
   // prettier-ignore
+  { id: 'cat-spices', name: 'Herbs & Spices', department: 'Ambient', sortOrder: 70, icon: 'leaf', colour: '#84cc16' },
+  // prettier-ignore
   { id: 'cat-snacks', name: 'Snacks', department: 'Ambient', sortOrder: 90, icon: 'cookie', colour: '#db2777' },
   // prettier-ignore
   { id: 'cat-drinks', name: 'Drinks', department: 'Ambient', sortOrder: 100, icon: 'cup', colour: '#0d9488' },
@@ -60,6 +62,7 @@ const STORES: Store[] = [
       'cat-meat',
       'cat-dairy',
       'cat-pantry',
+      'cat-spices',
       'cat-snacks',
       'cat-drinks',
       'cat-household',
@@ -126,8 +129,8 @@ const DEMO_PANTRY: DemoRow[] = [
   ['Bananas', 5, 'ea', 'cat-produce', 'loc-cupboard', 0.55, 3, 4],
   ['Baby spinach', 1, 'bag', 'cat-produce', 'loc-fridge', 4.0, 1, -1],
   ['Brown onions', 4, 'ea', 'cat-produce', 'loc-pantry', 0.7, 3, 25],
-  ['Cumin seeds', 1, 'jar', 'cat-pantry', 'loc-cupboard', 3.4, 1, 500],
-  ['Smoked paprika', 0, 'jar', 'cat-pantry', 'loc-cupboard', 4.2, 1, null],
+  ['Cumin seeds', 1, 'jar', 'cat-spices', 'loc-cupboard', 3.4, 1, 500],
+  ['Smoked paprika', 0, 'jar', 'cat-spices', 'loc-cupboard', 4.2, 1, null],
   ['Peas', 2, 'bag', 'cat-frozen', 'loc-freezer', 3.0, 1, 200],
   ['Dishwasher tablets', 1, 'box', 'cat-household', 'loc-cupboard', 14.0, 1, null],
   ['Coffee beans', 1, 'bag', 'cat-drinks', 'loc-pantry', 18.0, 1, 60],

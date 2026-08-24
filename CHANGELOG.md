@@ -8,6 +8,23 @@ Notable changes to Pantry Tracker. Format follows
 
 ### Added
 
+- **Herbs & Spices is a category again**, in chartreuse `#84cc16`, sitting after
+  Pantry Staples in the store walk order. The colour was picked by measuring
+  perceptual distance against the other nine in both light and dark: a cinnamon
+  brown scored better on the raw swatch but its lightened dark-mode shade landed
+  too close to Meat & Seafood.
+
+### Changed
+
+- Databases that have not migrated yet no longer fold Herbs & Spices into
+  Pantry Staples at all, so their spice items keep their category. Databases
+  that already ran the earlier merge get the category back, but not their
+  items -- that rewrite kept no record of which items had been spices, and
+  guessing would move the wrong ones. Those stay in Pantry Staples until
+  reassigned by hand.
+
+### Added
+
 - **Category names are printed in their category's colour**, so the whole
   pantry list can be read by colour rather than word by word. The swatch stays
   alongside, holding a straight left edge down the column that names of varying
@@ -38,11 +55,11 @@ Notable changes to Pantry Tracker. Format follows
 
 ### Changed
 
-- **Tins & Jars, Herbs & Spices and Baking are now part of Pantry Staples.**
-  Four ambient categories where one does the job; the grocery list groups more
-  tightly and the item form has a shorter dropdown. Existing items, grocery
-  lines, spends and store aisle orders are moved across automatically, so
-  nothing loses its category.
+- **Tins & Jars and Baking are now part of Pantry Staples.** Three ambient
+  categories where one does the job; the grocery list groups more tightly and
+  the item form has a shorter dropdown. Existing items, grocery lines, spends
+  and store aisle orders are moved across automatically, so nothing loses its
+  category. (Herbs & Spices was folded in too at first, and kept — see above.)
 
 ### Added
 
