@@ -6,6 +6,24 @@ Notable changes to Pantry Tracker. Format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Category names are printed in their category's colour**, so the whole
+  pantry list can be read by colour rather than word by word. The swatch stays
+  alongside, holding a straight left edge down the column that names of varying
+  length cannot.
+- `npm run check:contrast`, which audits every theme token pair and every
+  category shade against every background in the app, and fails the run rather
+  than reporting.
+
+### Fixed
+
+- **Expired rows kept a pale pink background after switching to dark mode.**
+  The row animates its background for hover feedback, and Chrome does not
+  restart a running transition when the custom property behind the value
+  changes -- so the row latched at the light `--danger-soft` and stayed there
+  under dark text. Expired rows now take their background with no transition.
+
 ### Changed
 
 - **All three themes are rebuilt on your Gemini colour swatch.** The twelve

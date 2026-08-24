@@ -243,3 +243,14 @@
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
+
+@media print {
+  /*
+   * Paper is white whatever the screen is set to, so a page printed from dark
+   * mode must still use the light-mode category shade. The dark shade is
+   * lightened to sit on a near-black surface and washes out on the page.
+   */
+  [data-mode='dark'] .category-name {
+    color: var(--cat-light, #000);
+  }
+}

@@ -567,9 +567,19 @@
   border-bottom: none;
 }
 
-/* "Expired -- turn whole line red" (notes, photo 01). */
+/*
+ * "Expired -- turn whole line red" (notes, photo 01).
+ *
+ * No transition on this one. The row above animates its background for hover
+ * feedback, but Chrome does not restart a running transition when the custom
+ * property behind the value changes -- so on a light-to-dark switch the row
+ * latched at the light `--danger-soft` and stayed pale pink under dark text.
+ * Expired rows take their background immediately instead; hover still reads,
+ * because it is a brightness filter rather than a colour change.
+ */
 .table tbody tr[data-expired='true'] {
   background: var(--danger-soft);
+  transition: none;
 }
 
 .table tbody tr[data-expired='true']:hover {
@@ -578,6 +588,16 @@
 }
 
 .table tbody tr[data-expired='true'] td {
+  color: var(--danger-soft-text);
+}
+
+/*
+ * An expired row is red end to end, so the category name gives up its own
+ * colour there. Keeping it would put a mid-tone hue on a red wash -- the one
+ * background the readable shades are not derived against -- and would fight
+ * the signal the row exists to send. The swatch still carries the category.
+ */
+.table tbody tr[data-expired='true'] .category-name {
   color: var(--danger-soft-text);
 }
 
@@ -996,6 +1016,24 @@
 
 .category-tag {
   white-space: nowrap;
+  gap: 6px;
+}
+
+/*
+ * The name carries the category's colour. Two shades are supplied by the
+ * component -- one readable on light surfaces, one on dark -- and the mode
+ * picks between them here, so no component needs to know the current theme.
+ *
+ * The fallback matters: a category with no colour, or one whose colour failed
+ * to parse, gets no custom properties at all and must not end up transparent.
+ */
+.category-name {
+  color: var(--cat-light, var(--text));
+  font-weight: 550;
+}
+
+[data-mode='dark'] .category-name {
+  color: var(--cat-dark, var(--text));
 }
 
 /* Swatch doubling as the colour picker in Settings. */
